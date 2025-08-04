@@ -22,26 +22,35 @@
 
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: var(--bg);
       color: var(--text);
-      transition: background 0.3s, color 0.3s;
+      transition: background 0.5s, color 0.5s;
       overflow-x: hidden;
-      background-image: url('https://images.unsplash.com/photo-1548092372-0d1bd40894a3?auto=format&fit=crop&w=1950&q=80');
-      background-size: cover;
-      background-attachment: fixed;
-      background-position: center;
+    }
+
+    canvas#particles-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
     }
 
     nav {
       position: fixed;
+      top: 0;
       width: 100%;
-      background: rgba(18, 18, 18, 0.9);
+      background: rgba(0, 0, 0, 0.85);
       padding: 1rem;
       display: flex;
       justify-content: center;
-      gap: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
       z-index: 1000;
+      backdrop-filter: blur(5px);
     }
 
     nav button {
@@ -49,67 +58,56 @@
       border: 1px solid var(--accent);
       color: var(--text);
       padding: 0.5rem 1rem;
+      border-radius: 20px;
       cursor: pointer;
-      border-radius: 5px;
-      transition: background 0.3s, box-shadow 0.3s;
+      font-weight: bold;
+      transition: 0.3s;
     }
 
     nav button:hover {
       background: var(--accent);
       color: #fff;
       box-shadow: 0 0 10px var(--accent);
+      transform: scale(1.05);
     }
 
     section {
-      min-height: 100vh;
-      padding: 5rem 2rem;
+      min-height: 50vh;
+      padding: 6rem 2rem 4rem;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      border-bottom: 1px solid #333;
+      text-align: center;
       position: relative;
+    }
+
+    .card {
       background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(4px);
-      box-shadow: 0 0 15px #1db95455;
+      backdrop-filter: blur(5px);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(29, 185, 84, 0.5);
+      max-width: 800px;
+      width: 90%;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 0 20px var(--accent);
     }
 
     h1, h2 {
       color: var(--accent);
       text-shadow: 0 0 10px var(--accent);
-    }
-
-    .toggle-theme {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      border-radius: 5px;
-      z-index: 1001;
-    }
-
-    .contact-form input,
-    .contact-form textarea {
-      width: 100%;
-      padding: 0.5rem;
       margin-bottom: 1rem;
-      border-radius: 5px;
-      border: 1px solid #555;
-      background-color: #222;
-      color: #fff;
-    }
+    } 
+    
 
-    .contact-form button {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
-      cursor: pointer;
+    p, li {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin: 0.5rem 0;
     }
 
     ul {
@@ -117,32 +115,61 @@
       padding: 0;
     }
 
-    ul li {
-      margin: 0.5rem 0;
-    }
-
-    .download-resume {
-      margin-top: 1rem;
-    }
-
-    .download-resume a {
-      display: inline-block;
+    .download-resume a,
+    .toggle-theme,
+    .contact-form button {
       background: var(--accent);
       color: #fff;
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: 0.3s;
       text-decoration: none;
-      transition: box-shadow 0.3s;
+      font-weight: bold;
     }
 
-    .download-resume a:hover {
+    .download-resume a:hover,
+    .toggle-theme:hover,
+    .contact-form button:hover {
       box-shadow: 0 0 10px var(--accent);
+      transform: scale(1.05);
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      max-width: 400px;
+      padding: 0.7rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      border: 1px solid #555;
+      background-color: #222;
+      color: #fff;
+    }
+
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      border: 1px solid var(--accent);
+      outline: none;
+    }
+
+    @media (max-width: 768px) {
+      h1, h2 {
+        font-size: 1.8rem;
+      }
+
+      p, li {
+        font-size: 1rem;
+      }
     }
   </style>
 </head>
 
 <body>
-  <button class="toggle-theme" id="theme-toggle">Toggle Theme</button>
+  <canvas id="particles-canvas"></canvas>
+
   <nav>
     <button onclick="scrollToSection('home')">Home</button>
     <button onclick="scrollToSection('about')">About</button>
@@ -155,91 +182,124 @@
     <button onclick="scrollToSection('contact')">Contact</button>
   </nav>
 
+  <section id="home" data-aos="fade-up" style="min-height: 20vh;">
+    <div class="card">
+        <h1>Welcome to My Portfolio</h1>
+    </div>
+  </section>
+
   <section id="home" data-aos="fade-up">
-    <h1>Welcome to My Portfolio</h1>
-    <p>Hi, I'm Mahesh Yerrajonna - Data Entry Operator</p>
-    <div class="download-resume">
-      <a href="Mahesh_Yerrajonna_Resume.pdf" download>Download Resume</a>
+    <div class="card">
+      <h2>Mahesh Yerrajonna</h2>
+          <p>Web Developer 🌐 | Data Entry Operator 👨🏻‍💻</p>
+        <br>
+      <div class="download-resume">
+        <a href="Mahesh_Yerrajonna_Resume.pdf" download>Download Resume</a>
+      </div>
+      <button class="toggle-theme" id="theme-toggle">Toggle Theme</button>
     </div>
   </section>
 
   <section id="about" data-aos="fade-right">
-    <h2>About Me</h2>
-    <p>Dedicated Data Entry Operator with attention to detail and accuracy, experienced in Excel, Word, and web technologies.</p>
+    <div class="card">
+      <h2>About Me</h2>
+          <p>I'm Mahesh, a passionate web developer with experience in HTML, CSS, Python, and Flask.</p>
+          <p>I specialize in building interactive websites, calculators, login systems, and resume builders.</p>
+          <p>I deliver clean, responsive designs with smooth functionality and aim to create user-friendly web applications that enhance user experience.</p>
+          <p>Feel free to explore my work and get in touch!</p>
+    </div>
   </section>
 
   <section id="skills" data-aos="fade-left">
+    <div class="card">
     <h2>Skills</h2>
-    <ul>
-      <li><i class="fab fa-microsoft"></i> MS Excel</li>
-      <li><i class="fab fa-microsoft"></i> MS Word</li>
-      <li><i class="fas fa-photo-video"></i> Photo & Video Editing</li>
-      <li><i class="fab fa-html5"></i> HTML</li>
-      <li><i class="fab fa-css3"></i> CSS</li>
-      <li><i class="fab fa-python"></i> Python Basics</li>
-    </ul>
+        <ul>
+          <li><i class="fab fa-microsoft"></i> MS Excel</li>
+          <li><i class="fab fa-microsoft"></i> MS Word</li>
+          <li><i class="fas fa-photo-video"></i> Photo & Video Editing</li>
+          <li><i class="fab fa-html5"></i> HTML</li>
+          <li><i class="fab fa-css3"></i> CSS</li>
+          <li><i class="fab fa-python"></i> Python Basics</li>
+        </ul>
+    </div>
   </section>
 
   <section id="experience" data-aos="zoom-in">
+    <div class="card">
     <h2>Experience</h2>
-    <p>Chegg Expert | Content Creator | 2 Years</p>
-    <p>Data Entry Operator | Freelance | 3 Years</p>
+        <h3>Chegg Expert</h3>
+            <p>Provided solutions to student queries in statistics (2023-Present)</p>
+        <h3>Data Entry Operator</h3>
+            <p>Managed data entry tasks efficiently (2019-2023)</p>
+        <h3>Kulfy-APP Content Creator</h3>
+            <p>Created engaging content for Kulfy-APP (2018-2019)</p>
+        </div>
   </section>
 
   <section id="education" data-aos="zoom-in">
-    <h2>Education</h2>
-    <p>B.Com - Dr. B.R. Ambedkar Open University</p>
-    <p>Intermediate - MPC - Board of Intermediate Education, AP</p>
-    <p>SSC - State Board of Andhra Pradesh</p>
+    <div class="card">
+        <h2>Education</h2>
+            <p>B.Com - Dr. B.R. Ambedkar Open University</p>
+            <p>Intermediate - MPC - Board of Intermediate Education, AP</p>
+            <p>SSC - State Board of Andhra Pradesh</p>
+    </div>
   </section>
 
   <section id="certifications" data-aos="fade-up">
+    <div class="card">
     <h2>Certifications</h2>
     <ul>
       <li>MS Office Certification</li>
+      <li>Employability Skills</li>
       <li>Basic HTML/CSS Training</li>
       <li>Python Fundamentals</li>
     </ul>
+    </div>
   </section>
 
   <section id="personal" data-aos="fade-up">
-    <h2>Personal Information</h2>
-    <p><strong>Name:</strong> Mahesh Yerrajonna</p>
-    <p><strong>DOB:</strong> 25-05-2002</p>
-    <p><strong>Location:</strong> Andhra Pradesh, India</p>
+    <div class="card">
+        <h2>Personal Information</h2>
+                <p><strong>🙋Name:</strong> Mahesh Yerrajonna</p>
+                <p><strong>💼Profession:</strong> Teacher, Web Developer, Data Entry Operator</p>
+                <p><strong>📧Email:</strong> mahesh.yerrajonna12@gmail.com</p>
+                <p><strong>🎂Age:</strong> 28</p>
+                <p><strong>📍Location:</strong> Andhra Pradesh, India</p>
+    </div>
   </section>
 
   <section id="hobbies" data-aos="fade-up">
+    <div class="card">
     <h2>Hobbies</h2>
-    <ul>
-      <li><i class="fas fa-music"></i> Listening to Music</li>
-      <li><i class="fas fa-camera"></i> Photography</li>
-      <li><i class="fas fa-book"></i> Reading</li>
-    </ul>
+        <ul>
+          <li><i class="fas fa-music"></i> Listening to Music</li>
+          <li><i class="fas fa-code"></i> Coding</li>
+          <li><i class="fas fa-gamepad"></i> Gaming</li>
+          <li><i class="fas fa-lightbulb"></i> Learning new skills</li>
+          <li><i class="fas fa-camera"></i> Photography</li>
+          <li><i class="fas fa-book"></i> Reading</li>
+        </ul>
+    </div>
   </section>
 
   <section id="contact" data-aos="fade-up">
-  <h2>Contact Me</h2>
-  <form class="contact-form" action="https://formspree.io/f/xanbbjdn" method="POST">
-    <input type="text" name="name" placeholder="Your Name" required />
-    <input type="email" name="email" placeholder="Your Email" required />
-    <textarea name="message" rows="4" placeholder="Your Message" required></textarea>
-    <button type="submit">Send Message</button>
-  </form>
-  <p>Email: mahesh.yerrajonna12@gmail.com </p>
-</section>
-
+    <div class="card">
+        <h2>Contact Me</h2>
+            <form class="contact-form" action="https://formspree.io/f/xanbbjdn" method="POST">
+              <input type="text" name="name" placeholder="Your Name 🧑‍💼" required />
+              <input type="email" name="email" placeholder="Your Email	📧" required />
+              <textarea name="message" rows="4" placeholder="Your Message 💬" required></textarea>
+              <br><button type="submit">Send Message</button>
+            </form>
+    </div>
+  </section> 
 
   <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
   <script>
-    AOS.init({
-      duration: 1000,
-      once: true,
-    });
+    AOS.init({ duration: 1000, once: true });
 
     document.getElementById('theme-toggle').addEventListener('click', () => {
-      document.documentElement.dataset.theme =
-        document.documentElement.dataset.theme === 'light' ? '' : 'light';
+      document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'light' ? '' : 'light';
     });
 
     function scrollToSection(id) {
@@ -248,6 +308,62 @@
         section.scrollIntoView({ behavior: 'smooth' });
       }
     }
+
+    // Particle Background Script
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function createParticles() {
+      particles = [];
+      for (let i = 0; i < 100; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 2 + 1,
+          dx: Math.random() * 1 - 0.5,
+          dy: Math.random() * 1 - 0.5
+        });
+      }
+    }
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function updateParticles() {
+      particles.forEach(p => {
+        p.x += p.dx;
+        p.y += p.dy;
+
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+      });
+    }
+
+    function animateParticles() {
+      drawParticles();
+      updateParticles();
+      requestAnimationFrame(animateParticles);
+    }
+
+    createParticles();
+    animateParticles();
   </script>
 </body>
 
